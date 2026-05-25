@@ -1,0 +1,57 @@
+name: ci
+
+# Lint + multi-arch Docker build. No untrusted user input in run: steps —
+# only standard GitHub actions (checkout, setup-python, setup-qemu,
+# setup-buildx, build-push). Matrix value is a constant set; no risk
+# of injection.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Static repo invariants
+        run: |
+          test -f LICENSE
+          grep -q "Apache" LICENSE
+          test -f docs/specs/2026-05-25-ai-home-assistant-architecture.md
+          test -f docker/Dockerfile
+          echo "static invariants OK"
+      - name: Smoke install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Make src importable
+          PYTHONPATH=src python -c "import ai_ha; print('package import:', ai_ha.__version__)"
+
+  multi-arch-build:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux/amd64, linux/arm64, linux/riscv64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

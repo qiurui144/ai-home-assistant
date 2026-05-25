@@ -1,0 +1,55 @@
+# ai-home-assistant standalone deployment.
+# Assumes Home Assistant Core is already running elsewhere
+# (reachable via HA_URL env var, e.g. http://homeassistant.local:8123).
+# For a bundled deploy, see docker-compose.with-ha.yml.
+
+services:
+  ai-home-assistant:
+    image: ghcr.io/qiurui144/ai-home-assistant:latest
+    container_name: ai-home-assistant
+    restart: unless-stopped
+    ports:
+      - "8124:8124"
+    volumes:
+      - ai-ha-data:/data
+    environment:
+      # Required — your existing Home Assistant Core
+      HA_URL: ${HA_URL:-http://homeassistant.local:8123}
+      HA_TOKEN: ${HA_TOKEN}
+      # Optional — pick your LLM provider via /data/config.toml
+      # (defaults: fast-tier = ollama localhost; capable = deepseek if key set)
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    # Resource shape per SoC. Tune in production.
+    # mem_limit: 500m
+    # cpus: 1.5
+
+    # Comments below describe what the spec says will go here over time;
+    # uncomment as the project lands those features.
+    # depends_on:
+    #   - mosquitto    # optional MQTT bridge for HA notifications
+    # networks:
+    #   - homeassistant
+
+  # Optional — uncomment to bring up a local MQTT broker. Useful when the
+  # AI HA wants to push suggestions / actions as MQTT topics that an
+  # existing HA dashboard can subscribe to.
+  # mosquitto:
+  #   image: eclipse-mosquitto:2.0
+  #   container_name: ai-ha-mqtt
+  #   restart: unless-stopped
+  #   ports:
+  #     - "1883:1883"
+  #   volumes:
+  #     - mqtt-config:/mosquitto/config
+  #     - mqtt-data:/mosquitto/data
+
+volumes:
+  ai-ha-data:
+  # mqtt-config:
+  # mqtt-data:
+
+# Override note for RK3588 / K3 deployments:
+#   AI HA inside `kvm-nas-dual` image lives in the `nas.slice` cgroup
+#   (A55 cores). Don't override cpuset here — let the host slice
+#   handle it. See KVM main spec §0 dual-role table.

@@ -1,0 +1,83 @@
+# ai-home-assistant default configuration.
+# Copied to /data/config.toml on first container start; subsequent runs
+# read your edited version.
+#
+# Spec reference: docs/specs/2026-05-25-ai-home-assistant-architecture.md
+
+[ha]
+# Required — your existing Home Assistant Core instance
+url = "http://homeassistant.local:8123"
+token = ""  # long-lived access token from HA Profile > Security
+# Override via HA_URL / HA_TOKEN env vars.
+
+[behavior]
+history_retention_days = 30        # event archive auto-prune
+preference_half_life_days = 14     # confidence decay
+min_observations_for_pattern = 5   # don't fire a habit until you've seen it N times
+
+[digest]
+max_tokens = 500                   # state digest budget for LLM context
+recent_event_window_minutes = 30   # include in digest if happened within window
+include_entities_pattern = []      # regex allowlist; empty = all (subject to size)
+
+[llm]
+fast_tier = "ollama-local"         # provider key for low-latency answers
+capable_tier = "deepseek"          # provider key for harder questions
+escalation_threshold = 0.7         # if fast tier confidence < this, escalate
+budget_usd_monthly = 5.0           # hard cap on cloud LLM spend
+
+[[llm.providers]]
+key = "ollama-local"
+label = "Ollama on host"
+base_url = "http://host.docker.internal:11434"
+default_model = "llama3.1"
+role = "fast"
+
+[[llm.providers]]
+key = "rkllm-device"
+label = "RKLLM on RK3588 device"
+base_url = "http://kvm.local:8891"
+default_model = "qwen3-0.6b"
+role = "fast"
+# Spec §0.5: when running on K3 RISC-V in future, swap this entry for
+# the SpacemiT NPU endpoint (URL TBD). The orchestrator code does not change.
+
+[[llm.providers]]
+key = "deepseek"
+label = "DeepSeek (cloud)"
+base_url = "https://api.deepseek.com"
+default_model = "deepseek-chat"
+role = "capable"
+# API key from DEEPSEEK_API_KEY env var
+
+[[llm.providers]]
+key = "openai"
+label = "OpenAI"
+base_url = "https://api.openai.com"
+default_model = "gpt-4o-mini"
+role = "capable"
+# API key from OPENAI_API_KEY env var
+
+[audit]
+retention_days = 90                # rolling; older entries archive to parquet
+hash_chain = true                  # tamper-evident log (same primitive as KVM)
+
+[privacy]
+# Default: cloud LLM disabled. User opts in once they understand the digest
+# (containing summarized entity state) leaves the device.
+allow_cloud_llm_with_digest = false
+# Stricter: even with cloud enabled, hide these entities entirely from digest
+hide_entities_pattern = []         # regex e.g. ["sensor.bank_card_*", "person.guest"]
+
+[web]
+host = "0.0.0.0"
+port = 8124
+require_auth = true
+# If true, first run creates a random admin token printed in container logs.
+# Set false ONLY behind a trusted reverse proxy.
+
+[soft_intention]
+# Soft-intention queue — LLM-proposed automations land here for user approval
+auto_dismiss_after_hours = 72
+max_queue_size = 50
+require_dual_confirm_for_critical = true  # door locks / alarms / power

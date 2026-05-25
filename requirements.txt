@@ -1,0 +1,22 @@
+# ai-home-assistant Python deps
+# Pinned to minor versions for reproducibility; bump deliberately.
+# Multi-arch concern: every dep here MUST have wheels for amd64+arm64+riscv64
+# OR be pure-python. riscv64 wheel availability often lags amd64 by 2-4 months.
+
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+httpx==0.27.2                   # HA REST client + LLM HTTP
+websockets==13.1                # HA WS client
+aiosqlite==0.20.0               # async SQLite for behavior store
+pydantic==2.9.2
+pydantic-settings==2.6.1
+tomli==2.0.2                    # config.toml parser
+python-dateutil==2.9.0          # time-curve modeling
+openai==1.51.0                  # OpenAI-compat client for all LLM providers
+prometheus-client==0.21.0       # /api/metrics expose
+paho-mqtt==2.1.0                # optional MQTT bridge
+
+# Test deps (not in production image; see Dockerfile multi-stage if separating)
+# pytest==8.3.3
+# pytest-asyncio==0.24.0
+# pytest-benchmark==4.0.0

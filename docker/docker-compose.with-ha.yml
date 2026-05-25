@@ -1,0 +1,70 @@
+# Bundled deploy — Home Assistant Core + ai-home-assistant + MQTT broker
+# + watchtower (opt-in auto-update). Useful for a fresh device.
+#
+# Bring up: `docker compose -f docker-compose.with-ha.yml up -d`
+# Tear down: `docker compose -f docker-compose.with-ha.yml down`
+#
+# Per spec §0.5 — targets RK3588 today, riscv64 (K3 future) is in CI matrix.
+
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    volumes:
+      - ./ha-config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    # Note: HA Core uses host network so it can auto-discover devices.
+    # The ai-home-assistant container talks to HA via http://localhost:8123.
+
+  ai-home-assistant:
+    image: ghcr.io/qiurui144/ai-home-assistant:latest
+    container_name: ai-home-assistant
+    restart: unless-stopped
+    depends_on:
+      - homeassistant
+      - mosquitto
+    ports:
+      - "8124:8124"
+    volumes:
+      - ai-ha-data:/data
+    environment:
+      HA_URL: http://localhost:8123
+      HA_TOKEN: ${HA_TOKEN}
+      MQTT_HOST: mosquitto
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    network_mode: host
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: ai-ha-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - mqtt-config:/mosquitto/config
+      - mqtt-data:/mosquitto/data
+      - mqtt-log:/mosquitto/log
+
+  # Opt-in. Comment out the entire watchtower service if you prefer manual upgrades.
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "0 0 3 * * *"  # every day at 03:00
+      WATCHTOWER_NOTIFICATIONS: ""
+    command: ai-home-assistant homeassistant mosquitto
+
+volumes:
+  ai-ha-data:
+  mqtt-config:
+  mqtt-data:
+  mqtt-log:
