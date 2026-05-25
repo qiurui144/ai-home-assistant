@@ -440,3 +440,35 @@ Optional cloud LLM at ~$0.0001-$0.001 per user-question (per token model).
   STT (Whisper-tiny)? Spec assumes HA-provided.
 - [ ] **Hardware test matrix**: which devices for CI? Suggested: GitHub Actions
   ubuntu-latest (amd64) + self-hosted RK3588 (arm64) + qemu-riscv64 (riscv64).
+
+---
+
+## Addendum 2026-05-25 (afternoon) — Kernel version pin per platform
+
+Per user: "K3 和 3588 做好分支管理，因为一个是 6.1 内核，一个是 6.18 的 OEM 内核"
+(see KVM main `docs/specs/2026-05-25-derivative-repo-standard.md` §0-bis)
+
+This is **mostly transparent** to ai-home-assistant because:
+- We run in Docker — the host kernel version is irrelevant to our container
+- Our only kernel dependency is **cgroup v2** (Linux ≥ 5.x), trivially met
+  by both 6.1.y and 6.18
+
+But two indirect implications:
+
+1. **Host platform detection** — for the optional `platform/rk3588.py` and
+   `platform/k3.py` adapters (when present), the code may want to know the
+   host kernel:
+   ```python
+   import platform
+   kernel = platform.release()  # "6.1.141-rockchip" vs "6.18.0-spacemit"
+   ```
+   Use this to gate NPU endpoint discovery (RKLLM on 8891 vs SpacemiT NPU on TBD).
+
+2. **kvm-build-env base image** — when our Dockerfile pulls
+   `FROM ghcr.io/qiurui144/kvm-build-env:latest`, it gets a userspace
+   compatible with both kernel versions (Bookworm glibc supports kernel ≥ 5.10).
+   No build-time branching needed.
+
+**Bottom line**: ai-home-assistant Docker image stays single-source; only
+the optional platform adapter modules diverge. CI matrix already covers
+both arches (arm64 for RK3588, riscv64 for K3 future).
