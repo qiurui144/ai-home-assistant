@@ -22,3 +22,9 @@ data/
 
 # Docker buildx temp
 .buildx-cache/
+
+# Test / build artifacts
+coverage
+.coverage
+htmlcov/
+dist/

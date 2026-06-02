@@ -1,0 +1,9 @@
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "RUF", "ASYNC", "S"]
+ignore = ["S101"]  # allow assert in tests
+
+[lint.per-file-ignores]
+"tests/**" = ["S105", "S106"]  # test fixtures may use fake passwords
