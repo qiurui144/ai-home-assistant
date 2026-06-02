@@ -1,0 +1,32 @@
+:root { --bg:#0f1115; --fg:#e6e8ef; --acc:#7df9aa; --muted:#8a90a0; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 14px/1.45 system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+header { display: flex; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid #222;
+         align-items: center; }
+header .brand { color: var(--acc); font-weight: 600; text-decoration: none; }
+header .ver { color: var(--muted); font-weight: 400; font-size: .8em; }
+header nav a { color: var(--fg); margin: 0 .5rem; text-decoration: none; }
+header nav a:hover { color: var(--acc); }
+main { padding: 1rem; max-width: 1100px; margin: 0 auto; }
+.banner { padding: .5rem 1rem; border-bottom: 1px solid #222; }
+.banner-info { background: #18242a; color: #cef; }
+.banner-warn { background: #3a2a00; color: #ffd; }
+.banner-error { background: #4a1010; color: #fdd; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.card { display: block; padding: 1rem; border: 1px solid #222; border-radius: 8px;
+        background: #15181f; text-decoration: none; color: inherit; }
+.card.active { border-color: var(--acc); }
+.card h2 { margin: 0 0 .5rem; font-size: 1.1em; }
+.metric span { font-weight: 600; color: var(--acc); }
+.classes { margin-top: .5rem; }
+.tag { display: inline-block; background: #222; padding: .15rem .4rem; border-radius: 4px;
+       font-size: .8em; margin: .1rem .15rem .1rem 0; }
+table { border-collapse: collapse; width: 100%; margin-top: .5rem; }
+th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid #222; }
+code { background: #1c1f27; padding: 0 .25rem; border-radius: 3px; }
+form textarea, form input { width: 100%; background: #1c1f27; color: var(--fg);
+                            border: 1px solid #333; padding: .5rem; }
+form button { margin-top: .5rem; padding: .4rem 1rem; background: var(--acc);
+              border: none; color: #000; border-radius: 4px; cursor: pointer; }
+footer { border-top: 1px solid #222; padding: 1rem; color: var(--muted); }
+.empty { color: var(--muted); }
