@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Entities · ai-home-assistant{% endblock %}
+{% block main %}
+<h1>Entities ({{ entities|length }})</h1>
+<table>
+  <thead><tr><th>entity_id</th><th>friendly</th><th>area</th><th>class</th><th>events/24h</th></tr></thead>
+  <tbody>
+  {% for e in entities %}
+  <tr>
+    <td><code>{{ e.entity_id }}</code></td>
+    <td>{{ e.friendly_name or "" }}</td>
+    <td>{{ e.area_id or "—" }}</td>
+    <td>{{ e.device_class or "" }}</td>
+    <td>{{ e.event_count_24h }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

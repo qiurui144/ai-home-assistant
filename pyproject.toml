@@ -6,6 +6,10 @@ readme = "README.md"
 license = { file = "LICENSE" }
 description = "AI Home Assistant — learns your household, augments existing HA Core"
 
+dependencies = [
+    "jinja2>=3.1",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["ai_ha*"]

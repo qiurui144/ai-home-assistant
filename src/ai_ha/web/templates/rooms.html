@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Rooms · ai-home-assistant{% endblock %}
+{% block main %}
+<h1>Rooms</h1>
+{% if not areas %}
+  <p class="empty">No areas yet. Waiting for first topology snapshot from Home Assistant.</p>
+{% else %}
+<div class="grid">
+  {% for a in areas %}
+  <a class="card{% if a.is_active %} active{% endif %}" href="/room/{{ a.area_id }}">
+    <h2>{{ a.name }}</h2>
+    <div class="metric"><span>{{ a.entity_count }}</span> entities</div>
+    <div class="metric"><span>{{ a.events_per_hour_24h }}</span> events/24h</div>
+    <div class="classes">
+      {% for cls, n in a.device_class_distribution.items() %}
+      <span class="tag">{{ cls }}×{{ n }}</span>
+      {% endfor %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

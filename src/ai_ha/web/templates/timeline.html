@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Timeline · ai-home-assistant{% endblock %}
+{% block main %}
+<h1>Timeline</h1>
+<table>
+  <thead><tr><th>Time (UTC)</th><th>Entity</th><th>Type</th></tr></thead>
+  <tbody id="events">
+  {% for ev in events %}
+  <tr><td>{{ ev.ts|tstoiso }}</td><td>{{ ev.entity_id }}</td><td>{{ ev.event_type }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+{% block scripts %}<script src="/static/timeline.js"></script>{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ area.name }} · ai-home-assistant{% endblock %}
+{% block main %}
+<h1>{{ area.name }}</h1>
+<section>
+  <h2>Entities ({{ entities|length }})</h2>
+  <ul>
+    {% for e in entities %}
+    <li>{{ e.friendly_name or e.entity_id }}
+      <code>{{ e.entity_id }}</code></li>
+    {% endfor %}
+  </ul>
+</section>
+<section>
+  <h2>Recent events</h2>
+  <table>
+    <thead><tr><th>Time (UTC)</th><th>Entity</th><th>Type</th></tr></thead>
+    <tbody>
+    {% for ev in recent_events %}
+    <tr><td>{{ ev.ts|tstoiso }}</td><td>{{ ev.entity_id }}</td><td>{{ ev.event_type }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

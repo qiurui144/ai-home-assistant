@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Settings · ai-home-assistant{% endblock %}
+{% block main %}
+<h1>Privacy Settings</h1>
+<form id="privacy-form">
+  <label>Hide entity regex (one per line)</label>
+  <textarea name="hide_entities_pattern" rows="6">{% for p in hide_pattern %}{{ p }}
+{% endfor %}</textarea>
+  <button type="submit">Save</button>
+  <p id="msg"></p>
+</form>
+{% endblock %}
+{% block scripts %}<script src="/static/settings.js"></script>{% endblock %}

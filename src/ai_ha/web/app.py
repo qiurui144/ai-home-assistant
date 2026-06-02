@@ -36,6 +36,10 @@ def create_app(
         from ai_ha.web.routes.stream import build_ws_router
         app.include_router(build_ws_router(state.broadcaster))
 
+    if state is not None:
+        from ai_ha.web.routes.pages import build_pages_router
+        app.include_router(build_pages_router(state, require_admin))
+
     static_dir = Path(__file__).parent / "static"
     if static_dir.exists():
         app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")

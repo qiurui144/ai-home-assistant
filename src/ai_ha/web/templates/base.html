@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}ai-home-assistant{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="brand">ai-home-assistant <span class="ver">v0.1.0</span></a>
+    <nav>
+      <a href="/">Rooms</a>
+      <a href="/entities">Entities</a>
+      <a href="/timeline">Timeline</a>
+      <a href="/settings">Settings</a>
+    </nav>
+  </header>
+  <div class="banner banner-info">v0.1.0 = Listen-only foundation.
+    AI suggestions arrive in v0.4.</div>
+  <main>{% block main %}{% endblock %}</main>
+  <footer>
+    <small>Spec:
+      <a href="/docs/superpowers/specs/2026-06-02-ai-home-assistant-v010-listen-only-design.md">design doc</a>.
+    </small>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
