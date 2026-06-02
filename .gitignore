@@ -24,7 +24,7 @@ data/
 .buildx-cache/
 
 # Test / build artifacts
-coverage
+coverage/
 .coverage
 htmlcov/
 dist/

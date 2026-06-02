@@ -111,8 +111,8 @@ def load_config(path: str | Path) -> AppConfig:
     p = Path(path)
     try:
         raw = tomllib.loads(p.read_text(encoding="utf-8"))
-    except FileNotFoundError as exc:
-        raise ConfigError(f"config file not found: {p}") from exc
+    except OSError as exc:
+        raise ConfigError(f"config file IO error ({p}): {exc}") from exc
     except tomllib.TOMLDecodeError as exc:
         raise ConfigError(f"TOML parse error in {p}: {exc}") from exc
     raw = _apply_env_overrides(raw)

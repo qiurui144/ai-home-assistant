@@ -3,13 +3,17 @@ target-version = "py311"
 
 [lint]
 select = ["E", "F", "W", "I", "B", "UP", "RUF", "ASYNC", "S"]
-ignore = ["S101"]  # allow assert in tests
+ignore = []
 
 [lint.per-file-ignores]
-"tests/**" = ["S105", "S106"]  # test fixtures may use fake passwords
+"tests/**" = ["S101", "S105", "S106"]  # assert + test passwords
 "tests/soak/**" = [
     "S603", "S607",    # subprocess with trusted args (docker/curl, not user input)
     "ASYNC221",        # intentional blocking subprocess in long-running soak harness
     "S311",            # random.random() used for non-crypto disconnect injection
     "RUF002",          # × multiplication sign in docstring is intentional
 ]
+
+[format]
+# line-length is inherited from top-level line-length = 100
+docstring-code-format = true

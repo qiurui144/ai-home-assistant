@@ -75,7 +75,7 @@ class SnapshotStore:
                 (ts_ms, new_hash, payload.to_canonical_json(), diff_summary),
             )
             await c.commit()
-            assert cur.lastrowid is not None
+            assert cur.lastrowid is not None  # noqa: S101
             return int(cur.lastrowid), True
 
 

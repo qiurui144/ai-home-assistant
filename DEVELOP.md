@@ -8,8 +8,7 @@
 
 ```bash
 # Build for your host arch (fast iteration)
-cd docker
-docker build -t ai-home-assistant:dev .
+docker build -t ai-home-assistant:dev -f docker/Dockerfile .
 
 # Build multi-arch (CI / release)
 docker buildx build \

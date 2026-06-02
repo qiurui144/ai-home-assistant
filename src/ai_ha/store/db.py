@@ -75,7 +75,7 @@ class Database:
             row = await (await c.execute("PRAGMA integrity_check")).fetchone()
             # PRAGMA integrity_check always returns at least one row; None here
             # would mean a fundamentally broken aiosqlite layer — assert is correct.
-            assert row is not None
+            assert row is not None  # noqa: S101
             if row[0] != "ok":
                 raise IntegrityError(f"sqlite integrity_check={row[0]}")
 
@@ -108,7 +108,7 @@ class Database:
         files = sorted(p for p in mig_path.iterdir() if _MIGRATION_PATTERN.match(p.name))
         for f in files:
             m = _MIGRATION_PATTERN.match(f.name)
-            assert m
+            assert m  # noqa: S101
             version = int(m.group(1))
             async with self.connect() as c:
                 current = await self._get_schema_version(c)

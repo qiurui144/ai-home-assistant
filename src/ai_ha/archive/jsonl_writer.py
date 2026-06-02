@@ -43,7 +43,7 @@ class JsonlWriter:
         day = datetime.fromtimestamp(ts_ms / 1000.0, UTC).strftime("%Y-%m-%d")
         async with self._lock:
             self._ensure_day(day)
-            assert self._handle is not None
+            assert self._handle is not None  # noqa: S101
             self._handle.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     async def flush(self) -> None:
