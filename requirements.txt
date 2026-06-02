@@ -11,6 +11,7 @@ aiosqlite==0.20.0               # async SQLite for behavior store
 pydantic==2.9.2
 pydantic-settings==2.6.1
 tomli==2.0.2                    # config.toml parser
+tomli-w==1.0.0                  # config.toml writer (settings route)
 python-dateutil==2.9.0          # time-curve modeling
 openai==1.51.0                  # OpenAI-compat client for all LLM providers
 prometheus-client==0.21.0       # /api/metrics expose
