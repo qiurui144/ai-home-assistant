@@ -97,7 +97,12 @@ def _apply_env_overrides(raw: dict[str, Any]) -> dict[str, Any]:
     if env_token := os.environ.get("HA_TOKEN"):
         raw.setdefault("ha", {})["token"] = env_token
     if env_port := os.environ.get("AI_HA_WEB_PORT"):
-        raw.setdefault("web", {})["port"] = int(env_port)
+        try:
+            raw.setdefault("web", {})["port"] = int(env_port)
+        except ValueError as exc:
+            raise ConfigError(
+                f"AI_HA_WEB_PORT must be an integer, got: {env_port!r}"
+            ) from exc
     return raw
 
 

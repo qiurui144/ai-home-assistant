@@ -38,3 +38,12 @@ def test_missing_required_field_raises(tmp_path):
     cfg_path.write_text("[ha]\nurl = ''\n")
     with pytest.raises(ConfigError):
         load_config(str(cfg_path))
+
+
+def test_invalid_port_env_raises_config_error(tmp_path, monkeypatch):
+    cfg_path = tmp_path / "config.toml"
+    cfg_path.write_text('[ha]\nurl = "http://x"\ntoken = "t"\n')
+    monkeypatch.setenv("AI_HA_WEB_PORT", "not-an-int")
+    with pytest.raises(ConfigError) as exc:
+        load_config(str(cfg_path))
+    assert "AI_HA_WEB_PORT" in str(exc.value)

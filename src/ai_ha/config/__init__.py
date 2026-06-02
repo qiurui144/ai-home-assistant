@@ -1,5 +1,6 @@
 from ai_ha.config.loader import (
     AppConfig,
+    ArchiveConfig,
     AuditConfig,
     BehaviorConfig,
     ConfigError,
@@ -15,6 +16,7 @@ from ai_ha.config.loader import (
 
 __all__ = [
     "AppConfig",
+    "ArchiveConfig",
     "AuditConfig",
     "BehaviorConfig",
     "ConfigError",
