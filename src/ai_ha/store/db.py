@@ -80,21 +80,21 @@ class Database:
                 raise IntegrityError(f"sqlite integrity_check={row[0]}")
 
     async def _ensure_kv_meta_table(self) -> None:
-        # kv_meta is created by migration 001_initial.sql.
-        # This method is intentionally a no-op: the migration runner calls
-        # _get_schema_version (which handles the missing-table case) and then
-        # applies 001_initial.sql which owns the CREATE TABLE statement.
-        pass
+        async with self.connect() as c:
+            await c.execute(
+                "CREATE TABLE IF NOT EXISTS kv_meta ("
+                "  key TEXT PRIMARY KEY, "
+                "  value TEXT NOT NULL, "
+                "  updated_at INTEGER NOT NULL"
+                ") WITHOUT ROWID"
+            )
+            await c.commit()
 
     async def _get_schema_version(self, c: aiosqlite.Connection) -> int:
-        # kv_meta may not exist yet (before migration 001 runs); return 0.
-        try:
-            row = await (await c.execute(
-                "SELECT value FROM kv_meta WHERE key='schema_version'"
-            )).fetchone()
-            return int(row[0]) if row else 0
-        except aiosqlite.OperationalError:
-            return 0
+        row = await (await c.execute(
+            "SELECT value FROM kv_meta WHERE key='schema_version'"
+        )).fetchone()
+        return int(row[0]) if row else 0
 
     async def _set_schema_version(self, c: aiosqlite.Connection, v: int) -> None:
         await c.execute(

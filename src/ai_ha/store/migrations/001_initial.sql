@@ -1,5 +1,5 @@
 -- kv_meta
-CREATE TABLE kv_meta (
+CREATE TABLE IF NOT EXISTS kv_meta (
     key         TEXT PRIMARY KEY,
     value       TEXT NOT NULL,
     updated_at  INTEGER NOT NULL
