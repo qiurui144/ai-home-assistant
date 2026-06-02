@@ -33,6 +33,14 @@ jobs:
           pip install -r requirements.txt
           # Make src importable
           PYTHONPATH=src python -c "import ai_ha; print('package import:', ai_ha.__version__)"
+      - name: Run unit + integration tests
+        run: |
+          pip install -r requirements.txt
+          PYTHONPATH=src pytest tests/unit tests/integration -v --cov=src/ai_ha --cov-report=term-missing
+      - name: Lint + type check
+        run: |
+          ruff check src/ tests/
+          mypy src/
 
   multi-arch-build:
     needs: lint-and-test
