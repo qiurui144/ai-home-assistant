@@ -7,3 +7,9 @@ ignore = ["S101"]  # allow assert in tests
 
 [lint.per-file-ignores]
 "tests/**" = ["S105", "S106"]  # test fixtures may use fake passwords
+"tests/soak/**" = [
+    "S603", "S607",    # subprocess with trusted args (docker/curl, not user input)
+    "ASYNC221",        # intentional blocking subprocess in long-running soak harness
+    "S311",            # random.random() used for non-crypto disconnect injection
+    "RUF002",          # × multiplication sign in docstring is intentional
+]
