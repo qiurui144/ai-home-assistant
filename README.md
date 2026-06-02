@@ -85,10 +85,7 @@ on first run). Important ones:
 
 ## Status
 
-**Spec stage** — no code yet. v0.1.0 target ~ 6 weeks of focused development
-(per [§12 timeline](docs/specs/2026-05-25-ai-home-assistant-architecture.md#12-实施时间线-建议)).
-
-Subscribe to repo for v0.1.0 release notification.
+**v0.1.0-rc.1** — Listen-only foundation, release candidate. See [RELEASE.md](RELEASE.md) for highlights and known limitations. GA (v0.1.0) requires real RK3588 hardware verification + 7d soak (see `tests/MANUAL_TEST_CHECKLIST.md`). v0.2 (histogram behavior model) starts after GA.
 
 ## License
 
