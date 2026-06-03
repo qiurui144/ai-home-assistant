@@ -68,16 +68,41 @@ check_prereq() {
   echo "✓ Prereqs OK (docker ✓ compose ✓ ports ${HA_PORT}/${AIHA_PORT} free)"
 }
 
+REPO_URL="${REPO_URL:-https://github.com/qiurui144/ai-home-assistant.git}"
+IMAGE_AIHA="${IMAGE_AIHA:-ghcr.io/qiurui144/ai-home-assistant:0.1.5}"
+IMAGE_HA="${IMAGE_HA:-ghcr.io/home-assistant/home-assistant:stable}"
+
+fetch_repo() {
+  if [[ -d "$INSTALL_DIR/.git" ]]; then
+    echo "↻ Updating $INSTALL_DIR..."
+    [[ -n "$DRY_RUN" ]] || (cd "$INSTALL_DIR" && git pull --ff-only)
+  else
+    echo "↓ Cloning to $INSTALL_DIR..."
+    [[ -n "$DRY_RUN" ]] || git clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
+  fi
+}
+
+pull_images() {
+  echo "↓ Pulling Docker images (5-10 min on first run)..."
+  echo "  - $IMAGE_HA"
+  echo "  - $IMAGE_AIHA"
+  if [[ -z "$DRY_RUN" ]]; then
+    docker pull "$IMAGE_HA"
+    docker pull "$IMAGE_AIHA"
+  fi
+}
+
 main() {
   if [[ "${1:-}" == "--help" ]]; then usage; exit 0; fi
   if [[ "${1:-}" == "--dry-run" ]]; then DRY_RUN=1; fi
   check_prereq
+  fetch_repo
+  pull_images
   if [[ -n "$DRY_RUN" ]]; then
-    echo "✓ Dry run complete. Prereq passed."
+    echo "✓ Dry run complete (prereq + repo + pull plan)."
     exit 0
   fi
-  echo "TODO: fetch_repo / pull_images / start_ha / prompt_token / start_aiha / banner"
-  echo "(future tasks)"
+  echo "TODO: start_ha / prompt_token / start_aiha / banner (next tasks)"
 }
 
 main "$@"

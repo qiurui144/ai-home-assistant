@@ -44,3 +44,21 @@ def test_missing_docker_exits_78(tmp_path):
     r = _run_install([], env_extra={"PATH": stub_path, "AIHA_DRY_RUN": "1"})
     assert r.returncode == 78
     assert "docker" in r.stderr.lower()
+
+
+def test_dry_run_shows_pull_plan(tmp_path):
+    # Provide stub docker + ss so prereq passes, then dry-run skips real pulls.
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    (fake_bin / "docker").write_text("#!/bin/sh\nexit 0\n")
+    (fake_bin / "docker").chmod(0o755)
+    (fake_bin / "ss").write_text("#!/bin/sh\nexit 0\n")
+    (fake_bin / "ss").chmod(0o755)
+    stub_path = str(fake_bin) + ":" + os.environ.get("PATH", "/usr/bin:/bin")
+    r = _run_install(["--dry-run"], env_extra={
+        "PATH": stub_path,
+        "INSTALL_DIR": str(tmp_path / "ai-ha"),
+    })
+    # Dry-run after Task 2 should report intended docker pull
+    assert r.returncode == 0
+    assert "ghcr.io/qiurui144/ai-home-assistant" in r.stdout
