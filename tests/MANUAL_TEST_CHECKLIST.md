@@ -64,3 +64,52 @@
 - [ ] G15 grep `except.*pass` = 0
 - [ ] G16 docs synced
 - [ ] G17 amd64 + arm64 + riscv64 build + RK3588 real
+
+---
+
+## v0.1.5 additions
+
+### install.sh
+
+- [ ] Fresh host: `curl ... | bash` completes in < 30 min
+- [ ] Token prompt prints clear instructions
+- [ ] Invalid token rejected with retry up to 3 attempts
+- [ ] Banner at end shows URL + admin token
+- [ ] Re-running install.sh is idempotent (no errors)
+- [ ] Ctrl-C mid-run cleans up unregistered containers
+
+### /dashboard
+
+- [ ] `/` redirects to /dashboard
+- [ ] Health strip shows 5 chips
+- [ ] Room grid renders with all areas
+- [ ] Live event sidebar updates on HA state change within 200ms
+- [ ] Room card transitions to "active" on event
+- [ ] WS reconnect within 30s of network blip
+
+### Responsive
+
+- [ ] iPhone Safari portrait: 1-col rooms grid, no horizontal scroll
+- [ ] iPhone Safari landscape: 2-col rooms grid
+- [ ] Android Chrome tablet 768+: 3-col rooms grid + sidebar visible
+- [ ] Desktop 1100+: 4-col rooms grid + full health strip
+
+### i18n
+
+- [ ] ?lang=zh switches all nav + dashboard headings
+- [ ] Cookie persists across page reloads
+- [ ] EN/中 switcher works on every page
+
+### Screenshots to capture in docs/screenshots/v015-ga-verification/
+
+- [ ] 01-install-sh-banner.png
+- [ ] 02-dashboard-desktop-en.png
+- [ ] 03-dashboard-desktop-zh.png
+- [ ] 04-dashboard-iphone-safari.png
+- [ ] 05-dashboard-android-chrome.png
+- [ ] 06-rooms-iphone.png
+- [ ] 07-room-detail-iphone.png
+- [ ] 08-timeline-iphone.png
+- [ ] 09-settings-iphone.png
+- [ ] 10-lang-switcher-zh.png
+- [ ] 11-live-update-demo.gif (optional)
