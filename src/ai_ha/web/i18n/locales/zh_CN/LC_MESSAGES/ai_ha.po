@@ -1,0 +1,101 @@
+# Chinese (Simplified, China) translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-06-03 10:50+0000\n"
+"PO-Revision-Date: 2026-06-03 10:53+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_Hans_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: src/ai_ha/web/templates/_macros.html:5
+msgid "entities"
+msgstr "设备"
+
+#: src/ai_ha/web/templates/_macros.html:10
+msgid "active"
+msgstr "活跃"
+
+#: src/ai_ha/web/templates/_macros.html:12
+msgid "idle"
+msgstr "闲置"
+
+#: src/ai_ha/web/templates/base.html:13
+#: src/ai_ha/web/templates/dashboard.html:3
+#: src/ai_ha/web/templates/dashboard.html:5
+msgid "Dashboard"
+msgstr "仪表盘"
+
+#: src/ai_ha/web/templates/base.html:14
+#: src/ai_ha/web/templates/dashboard.html:32
+#: src/ai_ha/web/templates/rooms.html:3 src/ai_ha/web/templates/rooms.html:5
+msgid "Rooms"
+msgstr "房间"
+
+#: src/ai_ha/web/templates/base.html:15
+#: src/ai_ha/web/templates/dashboard.html:13
+#: src/ai_ha/web/templates/room.html:7
+msgid "Entities"
+msgstr "设备"
+
+#: src/ai_ha/web/templates/base.html:16
+msgid "Timeline"
+msgstr "时间线"
+
+#: src/ai_ha/web/templates/base.html:17
+msgid "Settings"
+msgstr "设置"
+
+#: src/ai_ha/web/templates/dashboard.html:9
+msgid "WebSocket"
+msgstr "WebSocket"
+
+#: src/ai_ha/web/templates/dashboard.html:17
+msgid "Events/24h"
+msgstr "24 小时事件"
+
+#: src/ai_ha/web/templates/dashboard.html:21
+msgid "Privacy drops"
+msgstr "隐私丢弃"
+
+#: src/ai_ha/web/templates/dashboard.html:25
+msgid "Uptime"
+msgstr "在线时长"
+
+#: src/ai_ha/web/templates/dashboard.html:37
+msgid "Waiting for topology snapshot..."
+msgstr "等待 HA 拓扑加载..."
+
+#: src/ai_ha/web/templates/dashboard.html:43
+msgid "Live Events"
+msgstr "实时事件"
+
+#: src/ai_ha/web/templates/room.html:16
+msgid "Recent events"
+msgstr "最近事件"
+
+#: src/ai_ha/web/templates/room.html:18
+msgid "Time (UTC)"
+msgstr "时间 (UTC)"
+
+#: src/ai_ha/web/templates/room.html:18
+msgid "Entity"
+msgstr "设备"
+
+#: src/ai_ha/web/templates/room.html:18
+msgid "Type"
+msgstr "类型"
+
+#: src/ai_ha/web/templates/rooms.html:7
+msgid "No areas yet. Waiting for first topology snapshot."
+msgstr "暂无房间。等待 Home Assistant 拓扑同步..."

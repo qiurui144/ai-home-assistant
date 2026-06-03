@@ -1,0 +1,101 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-06-03 10:50+0000\n"
+"PO-Revision-Date: 2026-06-03 10:53+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: src/ai_ha/web/templates/_macros.html:5
+msgid "entities"
+msgstr "entities"
+
+#: src/ai_ha/web/templates/_macros.html:10
+msgid "active"
+msgstr "active"
+
+#: src/ai_ha/web/templates/_macros.html:12
+msgid "idle"
+msgstr "idle"
+
+#: src/ai_ha/web/templates/base.html:13
+#: src/ai_ha/web/templates/dashboard.html:3
+#: src/ai_ha/web/templates/dashboard.html:5
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: src/ai_ha/web/templates/base.html:14
+#: src/ai_ha/web/templates/dashboard.html:32
+#: src/ai_ha/web/templates/rooms.html:3 src/ai_ha/web/templates/rooms.html:5
+msgid "Rooms"
+msgstr "Rooms"
+
+#: src/ai_ha/web/templates/base.html:15
+#: src/ai_ha/web/templates/dashboard.html:13
+#: src/ai_ha/web/templates/room.html:7
+msgid "Entities"
+msgstr "Entities"
+
+#: src/ai_ha/web/templates/base.html:16
+msgid "Timeline"
+msgstr "Timeline"
+
+#: src/ai_ha/web/templates/base.html:17
+msgid "Settings"
+msgstr "Settings"
+
+#: src/ai_ha/web/templates/dashboard.html:9
+msgid "WebSocket"
+msgstr "WebSocket"
+
+#: src/ai_ha/web/templates/dashboard.html:17
+msgid "Events/24h"
+msgstr "Events/24h"
+
+#: src/ai_ha/web/templates/dashboard.html:21
+msgid "Privacy drops"
+msgstr "Privacy drops"
+
+#: src/ai_ha/web/templates/dashboard.html:25
+msgid "Uptime"
+msgstr "Uptime"
+
+#: src/ai_ha/web/templates/dashboard.html:37
+msgid "Waiting for topology snapshot..."
+msgstr "Waiting for topology snapshot..."
+
+#: src/ai_ha/web/templates/dashboard.html:43
+msgid "Live Events"
+msgstr "Live Events"
+
+#: src/ai_ha/web/templates/room.html:16
+msgid "Recent events"
+msgstr "Recent events"
+
+#: src/ai_ha/web/templates/room.html:18
+msgid "Time (UTC)"
+msgstr "Time (UTC)"
+
+#: src/ai_ha/web/templates/room.html:18
+msgid "Entity"
+msgstr "Entity"
+
+#: src/ai_ha/web/templates/room.html:18
+msgid "Type"
+msgstr "Type"
+
+#: src/ai_ha/web/templates/rooms.html:7
+msgid "No areas yet. Waiting for first topology snapshot."
+msgstr "No areas yet. Waiting for first topology snapshot."

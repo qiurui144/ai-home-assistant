@@ -49,3 +49,13 @@ async def test_lang_switcher_in_base_template(app_pair):
         r = await c.get("/rooms")
         # base.html should include lang options
         assert "ai-ha-lang" in r.text or "lang-switcher" in r.text or "?lang=" in r.text
+
+
+@pytest.mark.asyncio
+async def test_dashboard_renders_chinese_when_lang_zh(app_pair):
+    """Dashboard page shows Chinese when ?lang=zh."""
+    app, _ts = app_pair
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://x") as c:
+        r = await c.get("/dashboard?lang=zh")
+        assert r.status_code == 200
+        assert "仪表盘" in r.text  # "Dashboard" in zh_CN
