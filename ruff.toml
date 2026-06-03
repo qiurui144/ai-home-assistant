@@ -13,6 +13,9 @@ ignore = []
     "S311",            # random.random() used for non-crypto disconnect injection
     "RUF002",          # × multiplication sign in docstring is intentional
 ]
+"tests/integration/test_install_script.py" = [
+    "S603", "S607",    # subprocess invoking bash with trusted fixture paths
+]
 
 [format]
 # line-length is inherited from top-level line-length = 100
