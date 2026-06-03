@@ -143,3 +143,39 @@ def test_full_dry_run_succeeds(tmp_path):
     })
     assert r.returncode == 0
     assert "ai-home-assistant is ready" in r.stdout.lower() or "Dry run complete" in r.stdout
+
+
+def test_dry_run_idempotent_no_state_change(tmp_path):
+    """Running --dry-run twice should be deterministic, no error."""
+    fake_path = tmp_path / "bin"
+    fake_path.mkdir()
+    for binary in ("docker", "ss"):
+        stub = fake_path / binary
+        stub.write_text("#!/bin/sh\nexit 0\n")
+        stub.chmod(0o755)
+    env = {"PATH": f"{fake_path}:{os.environ['PATH']}", "INSTALL_DIR": str(tmp_path / "ai-ha")}
+    r1 = _run_install(["--dry-run"], env_extra=env)
+    r2 = _run_install(["--dry-run"], env_extra=env)
+    assert r1.returncode == 0
+    assert r2.returncode == 0
+
+
+def test_help_does_not_require_docker(tmp_path):
+    """--help should work even without docker (don't run prereq)."""
+    fake_path = tmp_path / "bin"
+    fake_path.mkdir()
+    # Even with minimal PATH (no docker/ss), --help must succeed
+    # Preserve /usr/bin for bash itself to work
+    stub_path = str(fake_path) + ":" + os.environ.get("PATH", "/usr/bin:/bin")
+    r = _run_install(["--help"], env_extra={"PATH": stub_path})
+    assert r.returncode == 0
+
+
+def test_token_with_shell_injection_rejected():
+    """Token containing shell metacharacters must be rejected."""
+    r = subprocess.run(
+        ["bash", "-c", f"source {INSTALL_SH}; HA_PORT=1 validate_token '; rm -rf /'"],
+        capture_output=True, text=True, check=False,
+    )
+    assert r.returncode == 78
+    assert "invalid characters" in r.stderr.lower()
