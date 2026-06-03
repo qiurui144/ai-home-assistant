@@ -26,3 +26,4 @@ ruff==0.7.0
 mypy==1.11.2
 watchfiles==0.24.0
 respx==0.21.1                   # mock httpx in tests
+Babel==2.16.0
