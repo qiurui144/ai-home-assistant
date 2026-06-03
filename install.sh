@@ -92,17 +92,41 @@ pull_images() {
   fi
 }
 
+start_ha() {
+  echo "▶ Starting Home Assistant on port ${HA_PORT}..."
+  if [[ -n "$DRY_RUN" ]]; then
+    echo "  (dry-run) would compose up homeassistant + wait health on :${HA_PORT}"
+    return 0
+  fi
+  cd "$INSTALL_DIR/docker"
+  INSTALL_INCOMPLETE=1
+  docker compose -f docker-compose.with-ha.yml up -d homeassistant
+  echo "↻ Waiting HA to be ready (max 60s)..."
+  local attempt
+  for attempt in 1 2 3 4 5 6; do
+    if curl -fsS --max-time 5 "http://localhost:${HA_PORT}/" >/dev/null 2>&1; then
+      echo "✓ HA ready at http://localhost:${HA_PORT}"
+      return 0
+    fi
+    sleep 10
+  done
+  echo "ERR: HA didn't start in 60s. Recent logs:" >&2
+  docker compose -f docker-compose.with-ha.yml logs --tail=20 homeassistant >&2
+  exit 70
+}
+
 main() {
   if [[ "${1:-}" == "--help" ]]; then usage; exit 0; fi
   if [[ "${1:-}" == "--dry-run" ]]; then DRY_RUN=1; fi
   check_prereq
   fetch_repo
   pull_images
+  start_ha
   if [[ -n "$DRY_RUN" ]]; then
-    echo "✓ Dry run complete (prereq + repo + pull plan)."
+    echo "✓ Dry run complete (prereq + repo + pull + ha-start plan)."
     exit 0
   fi
-  echo "TODO: start_ha / prompt_token / start_aiha / banner (next tasks)"
+  echo "TODO: prompt_token / start_aiha / banner (next tasks)"
 }
 
 main "$@"

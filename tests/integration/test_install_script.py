@@ -62,3 +62,18 @@ def test_dry_run_shows_pull_plan(tmp_path):
     # Dry-run after Task 2 should report intended docker pull
     assert r.returncode == 0
     assert "ghcr.io/qiurui144/ai-home-assistant" in r.stdout
+
+
+def test_dry_run_mentions_ha_health_wait(tmp_path):
+    fake_path = tmp_path / "bin"
+    fake_path.mkdir()
+    for binary in ("docker", "ss"):
+        stub = fake_path / binary
+        stub.write_text("#!/bin/sh\nexit 0\n")
+        stub.chmod(0o755)
+    r = _run_install(["--dry-run"], env_extra={
+        "PATH": f"{fake_path}:{os.environ['PATH']}",
+        "INSTALL_DIR": str(tmp_path / "ai-ha"),
+    })
+    assert r.returncode == 0
+    assert "health" in r.stdout.lower() or "8123" in r.stdout
