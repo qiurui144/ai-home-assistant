@@ -1,16 +1,10 @@
-"""i18n module for ai-home-assistant Web UI.
-
-Real implementation arrives in Task 9. This stub allows the package to be
-importable so Task 10's Jinja env wiring doesn't fail at install time.
-"""
+"""i18n module for ai-home-assistant Web UI."""
 from __future__ import annotations
 
-__all__ = ["locale_from_request", "install_translations"]
+from ai_ha.web.i18n.loader import (
+    SUPPORTED_LOCALES,
+    get_translation,
+    locale_from_request,
+)
 
-
-def locale_from_request(*_args: object, **_kwargs: object) -> str:
-    return "en"
-
-
-def install_translations(*_args: object, **_kwargs: object) -> None:
-    pass
+__all__ = ["SUPPORTED_LOCALES", "get_translation", "locale_from_request"]
