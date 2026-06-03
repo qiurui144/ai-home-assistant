@@ -32,6 +32,9 @@ def create_app(
     app.include_router(_ev(state, require_admin))
     app.include_router(_s(state, require_admin))
 
+    from ai_ha.web.routes.lang import build_lang_router
+    app.include_router(build_lang_router())
+
     if state is not None and state.broadcaster is not None:
         from ai_ha.web.routes.stream import build_ws_router
         app.include_router(build_ws_router(state.broadcaster))
