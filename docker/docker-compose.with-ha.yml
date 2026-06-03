@@ -24,6 +24,8 @@ services:
     image: ghcr.io/qiurui144/ai-home-assistant:latest
     container_name: ai-home-assistant
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       - homeassistant
       - mosquitto

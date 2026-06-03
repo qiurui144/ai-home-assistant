@@ -43,33 +43,46 @@ Single image, three architectures:
 
 Image: `ghcr.io/qiurui144/ai-home-assistant:v<version>`.
 
-## Quickstart (standalone next to existing HA)
+## Quickstart (one-shot install)
+
+On a Linux host with Docker + docker compose plugin:
 
 ```bash
-# Assumes Home Assistant Core already running at http://homeassistant.local:8123
-mkdir -p ai-ha-data
+curl -fsSL https://raw.githubusercontent.com/qiurui144/ai-home-assistant/main/install.sh | bash
+```
+
+The script:
+1. Checks Docker + ports 8123/8124
+2. Pulls images for Home Assistant + ai-home-assistant
+3. Starts HA and waits for it to be ready
+4. Guides you to create a HA long-lived access token
+5. Starts ai-home-assistant
+6. Prints the URLs and admin token
+
+Total time: ~30 minutes on first run (mostly image pull).
+
+### Quickstart (manual install)
+
+If you prefer not to pipe a script:
+
+```bash
+git clone https://github.com/qiurui144/ai-home-assistant.git
+cd ai-home-assistant
+bash install.sh
+```
+
+### Quickstart (existing HA)
+
+If you already have HA Core running, point ai-home-assistant at it:
+
+```bash
 docker run -d --name ai-home-assistant \
   -p 8124:8124 \
   -v $PWD/ai-ha-data:/data \
   -e HA_URL=http://homeassistant.local:8123 \
   -e HA_TOKEN=<long-lived-access-token> \
-  ghcr.io/qiurui144/ai-home-assistant:latest
+  ghcr.io/qiurui144/ai-home-assistant:0.1.5
 ```
-
-Then visit http://localhost:8124 for the AI dashboard.
-
-## Quickstart (compose, bundles HA Core)
-
-For a fresh device with no existing HA:
-
-```bash
-git clone https://github.com/qiurui144/ai-home-assistant.git
-cd ai-home-assistant/docker
-docker compose -f docker-compose.with-ha.yml up -d
-```
-
-Brings up: Home Assistant Core (port 8123) + ai-home-assistant (8124) +
-Mosquitto MQTT broker + watchtower (auto-update opt-in).
 
 ## Configuration knobs
 
