@@ -48,6 +48,7 @@ def build_pages_router(
                 "rooms": [], "recent_events": [],
             }
         return _render(request, "dashboard.html", {
+            "initial": initial,
             "initial_json": _json.dumps(initial, ensure_ascii=False),
         })
 

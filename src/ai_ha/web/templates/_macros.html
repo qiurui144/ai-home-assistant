@@ -1,0 +1,24 @@
+{% macro room_card(room) %}
+<div class="room-card{% if room.active %} active{% endif %}" data-area-id="{{ room.area_id }}">
+  <h3>{{ room.name or room.area_id }}</h3>
+  <div class="room-meta">
+    <span class="metric">{{ room.entity_count }} {% trans %}entities{% endtrans %}</span>
+    <span class="metric">{{ room.events_per_hour_24h }}/24h</span>
+  </div>
+  <div class="room-status">
+    {% if room.active %}
+      <span class="status-dot active">●</span> <span class="trans-active">{% trans %}active{% endtrans %}</span>
+    {% else %}
+      <span class="status-dot idle">○</span> <span class="trans-idle">{% trans %}idle{% endtrans %}</span>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro event_row(ev) %}
+<li class="event-row" data-ts="{{ ev.ts }}">
+  <span class="event-time">{{ ev.ts | tstoiso }}</span>
+  <span class="event-entity">{{ ev.entity_id }}</span>
+  {% if ev.area_id %}<span class="event-area">{{ ev.area_id }}</span>{% endif %}
+</li>
+{% endmacro %}

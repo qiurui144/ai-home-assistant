@@ -1,8 +1,54 @@
 {% extends "base.html" %}
+{% from "_macros.html" import room_card, event_row %}
 {% block title %}{% trans %}Dashboard{% endtrans %} · ai-home-assistant{% endblock %}
 {% block main %}
 <h1>{% trans %}Dashboard{% endtrans %}</h1>
-<p class="empty" id="dashboard-loading">Loading...</p>
-<div id="dashboard-app" data-initial="{{ initial_json }}"></div>
+
+<section class="health-strip" id="health-strip">
+  <span class="chip">
+    <span class="chip-label">{% trans %}WebSocket{% endtrans %}</span>
+    <span class="chip-value" id="chip-ws">●</span>
+  </span>
+  <span class="chip">
+    <span class="chip-label">{% trans %}Entities{% endtrans %}</span>
+    <span class="chip-value" id="chip-entities">{{ initial.health.get('entities_count', '—') }}</span>
+  </span>
+  <span class="chip">
+    <span class="chip-label">{% trans %}Events/24h{% endtrans %}</span>
+    <span class="chip-value" id="chip-events">{{ initial.health.get('events_per_hour', 0) }}</span>
+  </span>
+  <span class="chip">
+    <span class="chip-label">{% trans %}Privacy drops{% endtrans %}</span>
+    <span class="chip-value" id="chip-drops">{{ initial.health.get('hidden_event_count', 0) }}</span>
+  </span>
+  <span class="chip">
+    <span class="chip-label">{% trans %}Uptime{% endtrans %}</span>
+    <span class="chip-value" id="chip-uptime">{{ initial.health.get('uptime_seconds', 0) }}s</span>
+  </span>
+</section>
+
+<section class="dashboard-grid">
+  <div class="rooms-panel">
+    <h2>{% trans %}Rooms{% endtrans %}</h2>
+    <div class="room-grid" id="room-grid">
+      {% for r in initial.rooms %}
+        {{ room_card(r) }}
+      {% else %}
+        <p class="empty">{% trans %}Waiting for topology snapshot...{% endtrans %}</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="events-panel">
+    <h2>{% trans %}Live Events{% endtrans %} <span class="live-dot" id="live-dot">●</span></h2>
+    <ul class="event-stream" id="event-stream">
+      {% for ev in initial.recent_events %}
+        {{ event_row(ev) }}
+      {% endfor %}
+    </ul>
+  </aside>
+</section>
+
+<script id="dashboard-initial" type="application/json">{{ initial_json | safe }}</script>
 {% endblock %}
 {% block scripts %}<script src="/static/dashboard.js"></script>{% endblock %}
