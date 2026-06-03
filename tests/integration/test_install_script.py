@@ -128,3 +128,18 @@ def test_token_validation_accepts_valid(tmp_path):
             capture_output=True, text=True, check=False,
         )
         assert r.returncode == 0
+
+
+def test_full_dry_run_succeeds(tmp_path):
+    fake_path = tmp_path / "bin"
+    fake_path.mkdir()
+    for binary in ("docker", "ss"):
+        stub = fake_path / binary
+        stub.write_text("#!/bin/sh\nexit 0\n")
+        stub.chmod(0o755)
+    r = _run_install(["--dry-run"], env_extra={
+        "PATH": f"{fake_path}:{os.environ['PATH']}",
+        "INSTALL_DIR": str(tmp_path / "ai-ha"),
+    })
+    assert r.returncode == 0
+    assert "ai-home-assistant is ready" in r.stdout.lower() or "Dry run complete" in r.stdout

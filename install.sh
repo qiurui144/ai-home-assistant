@@ -172,6 +172,55 @@ EOF
   exit 78
 }
 
+start_aiha() {
+  echo "▶ Starting ai-home-assistant on port ${AIHA_PORT}..."
+  if [[ -n "$DRY_RUN" ]]; then
+    echo "  (dry-run) would compose up ai-home-assistant + wait health on :${AIHA_PORT}"
+    return 0
+  fi
+  cd "$INSTALL_DIR/docker"
+  docker compose -f docker-compose.with-ha.yml up -d ai-home-assistant
+  echo "↻ Waiting ai-ha to be ready (max 30s)..."
+  for _ in 1 2 3; do
+    if curl -fsS --max-time 5 "http://localhost:${AIHA_PORT}/api/health" >/dev/null 2>&1; then
+      INSTALL_INCOMPLETE=""
+      echo "✓ ai-home-assistant ready"
+      return 0
+    fi
+    sleep 10
+  done
+  echo "ERR: ai-ha didn't start. Recent logs:" >&2
+  docker compose -f docker-compose.with-ha.yml logs --tail=20 ai-home-assistant >&2
+  exit 70
+}
+
+print_banner() {
+  local admin_token=""
+  if [[ -z "$DRY_RUN" ]]; then
+    admin_token=$(docker exec ai-home-assistant cat /data/.admin-token 2>/dev/null || echo "<check 'docker logs ai-home-assistant'>")
+  else
+    admin_token="<set after first run>"
+  fi
+  cat <<EOF
+
+════════════════════════════════════════════════════════════
+║ ✓ ai-home-assistant is ready!
+║
+║ URL:           http://localhost:${AIHA_PORT}
+║ admin user:    admin
+║ admin token:   ${admin_token}
+║ HA URL:        http://localhost:${HA_PORT}
+║
+║ Open the URL above and log in with admin / <token>.
+║ Bookmark /dashboard for the main view.
+║
+║ Logs:  docker compose -f $INSTALL_DIR/docker/docker-compose.with-ha.yml logs -f ai-home-assistant
+║ Stop:  docker compose -f $INSTALL_DIR/docker/docker-compose.with-ha.yml down
+║ Re-run install.sh anytime — it's idempotent.
+════════════════════════════════════════════════════════════
+EOF
+}
+
 main() {
   if [[ "${1:-}" == "--help" ]]; then usage; exit 0; fi
   if [[ "${1:-}" == "--dry-run" ]]; then DRY_RUN=1; fi
@@ -180,11 +229,8 @@ main() {
   pull_images
   start_ha
   prompt_token
-  if [[ -n "$DRY_RUN" ]]; then
-    echo "✓ Dry run complete (all stages except actual exec)."
-    exit 0
-  fi
-  echo "TODO: start_aiha / banner (final task)"
+  start_aiha
+  print_banner
 }
 
 # Only run main when executed directly, not when sourced (e.g. for unit tests).
