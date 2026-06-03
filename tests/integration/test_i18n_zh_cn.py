@@ -46,6 +46,6 @@ async def test_rooms_page_default_english(app_pair):
 async def test_lang_switcher_in_base_template(app_pair):
     app, _ts = app_pair
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://x") as c:
-        r = await c.get("/")
+        r = await c.get("/rooms")
         # base.html should include lang options
         assert "ai-ha-lang" in r.text or "lang-switcher" in r.text or "?lang=" in r.text

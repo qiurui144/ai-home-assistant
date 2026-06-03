@@ -34,7 +34,25 @@ def build_pages_router(
     router = APIRouter(dependencies=[Depends(require_admin)])
 
     @router.get("/", response_class=HTMLResponse)
-    async def rooms(request: Request) -> HTMLResponse:
+    async def root_redirect() -> RedirectResponse:
+        return RedirectResponse("/dashboard", status_code=307)
+
+    @router.get("/dashboard", response_class=HTMLResponse)
+    async def dashboard_page(request: Request) -> HTMLResponse:
+        import json as _json
+        # Best-effort initial data; client will refetch via /api/v1/dashboard
+        initial: dict[str, object] = {"health": {}, "rooms": [], "recent_events": []}
+        if state is not None:
+            initial = {
+                "health": state.health.snapshot(now_ms=int(__import__("time").time() * 1000)),
+                "rooms": [], "recent_events": [],
+            }
+        return _render(request, "dashboard.html", {
+            "initial_json": _json.dumps(initial, ensure_ascii=False),
+        })
+
+    @router.get("/rooms", response_class=HTMLResponse)
+    async def rooms_page(request: Request) -> HTMLResponse:
         if state is None:
             return _render(request, "rooms.html", {"areas": []})
         rows = await state.dao.list_areas()
