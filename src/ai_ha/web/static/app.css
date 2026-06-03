@@ -30,3 +30,6 @@ form button { margin-top: .5rem; padding: .4rem 1rem; background: var(--acc);
               border: none; color: #000; border-radius: 4px; cursor: pointer; }
 footer { border-top: 1px solid #222; padding: 1rem; color: var(--muted); }
 .empty { color: var(--muted); }
+.lang-switcher { margin-left: auto; display: flex; gap: 0.4rem; }
+.lang-switcher .lang-link { color: var(--muted); padding: 0.1rem 0.3rem; border: 1px solid #333; border-radius: 3px; }
+.lang-switcher .lang-link:hover { color: var(--acc); }
