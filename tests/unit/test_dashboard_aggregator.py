@@ -63,3 +63,41 @@ async def test_dashboard_empty_when_no_data(tmp_path):
         body = r.json()
         assert body["rooms"] == []
         assert body["recent_events"] == []
+
+
+@pytest.mark.asyncio
+async def test_dashboard_requires_auth(tmp_path):
+    db = await Database.open(str(tmp_path / "x.db"), migrations_dir=str(SCHEMA))
+    state = AppState(
+        dao=StoreDAO(db), snapshot_store=SnapshotStore(db),
+        entity_index=EntityIndex(), health=HealthMetrics(install_start_ms=0),
+        config_path=tmp_path / "c.toml", hide_pattern=[], on_privacy_update=None,
+    )
+    ts = AdminTokenStore(str(tmp_path / "t"))
+    ts.ensure_token()
+    app = create_app(token_store=ts, state=state, require_auth=True)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://x") as c:
+        r = await c.get("/api/v1/dashboard")
+        assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_dashboard_recent_events_capped_at_50(tmp_path):
+    db = await Database.open(str(tmp_path / "x.db"), migrations_dir=str(SCHEMA))
+    dao = StoreDAO(db)
+    await dao.insert_events([EventRow(
+        i, i, "x", "state_changed", None, '"on"',
+        None, None, None, None, None, 1,
+    ) for i in range(100)])
+    state = AppState(
+        dao=dao, snapshot_store=SnapshotStore(db),
+        entity_index=EntityIndex(), health=HealthMetrics(install_start_ms=0),
+        config_path=tmp_path / "c.toml", hide_pattern=[], on_privacy_update=None,
+    )
+    ts = AdminTokenStore(str(tmp_path / "t"))
+    ts.ensure_token()
+    app = create_app(token_store=ts, state=state, require_auth=False)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://x") as c:
+        r = await c.get("/api/v1/dashboard")
+        body = r.json()
+        assert len(body["recent_events"]) == 50
