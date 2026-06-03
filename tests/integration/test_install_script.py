@@ -3,8 +3,12 @@
 install.sh is pure bash. Tests invoke it as a subprocess with a stub PATH
 that controls whether docker/compose are 'installed'.
 """
+import contextlib
+import http.server
 import os
+import socketserver
 import subprocess
+import threading
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent
@@ -77,3 +81,50 @@ def test_dry_run_mentions_ha_health_wait(tmp_path):
     })
     assert r.returncode == 0
     assert "health" in r.stdout.lower() or "8123" in r.stdout
+
+
+@contextlib.contextmanager
+def mock_ha_validator(token: str = "valid-token"):  # noqa: S107
+    """Tiny HTTP server that 200's for Bearer <token>, 401 otherwise."""
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            auth = self.headers.get("Authorization", "")
+            if auth == f"Bearer {token}":
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b'{"message":"API running."}')
+            else:
+                self.send_response(401)
+                self.end_headers()
+
+        def log_message(self, *_args, **_kwargs):
+            pass
+
+    server = socketserver.TCPServer(("127.0.0.1", 0), Handler)
+    port = server.server_address[1]
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield port
+    finally:
+        server.shutdown()
+
+
+def test_token_validation_rejects_invalid(tmp_path):
+    """install.sh token validation should reject 401."""
+    with mock_ha_validator("the-good-token") as port:
+        r = subprocess.run(
+            ["bash", "-c", f"source {INSTALL_SH}; HA_PORT={port} validate_token wrong-token"],
+            capture_output=True, text=True, check=False,
+        )
+        assert r.returncode == 78
+        assert "401" in r.stderr or "invalid" in r.stderr.lower()
+
+
+def test_token_validation_accepts_valid(tmp_path):
+    with mock_ha_validator("the-good-token") as port:
+        r = subprocess.run(
+            ["bash", "-c", f"source {INSTALL_SH}; HA_PORT={port} validate_token the-good-token"],
+            capture_output=True, text=True, check=False,
+        )
+        assert r.returncode == 0

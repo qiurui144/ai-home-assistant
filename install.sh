@@ -115,6 +115,63 @@ start_ha() {
   exit 70
 }
 
+validate_token() {
+  local token="$1"
+  if [[ ! "$token" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    echo "ERR: token contains invalid characters (allowed: A-Za-z0-9._-)" >&2
+    return 78
+  fi
+  local code
+  code=$(curl -sS -o /dev/null -w "%{http_code}" \
+    -H "Authorization: Bearer $token" --max-time 5 \
+    "http://localhost:${HA_PORT}/api/" || echo "000")
+  if [[ "$code" != "200" ]]; then
+    echo "ERR: token rejected by HA (HTTP $code)" >&2
+    return 78
+  fi
+  return 0
+}
+
+prompt_token() {
+  cat <<EOF
+
+════════════════════════════════════════════════════════════
+║ NEXT STEP — Generate a Home Assistant access token
+║
+║ 1. Open in your browser:  http://<this-host>:${HA_PORT}
+║ 2. Create your HA account (or sign in)
+║ 3. Click your username (bottom-left) → "Security"
+║ 4. Long-Lived Access Tokens → "Create Token"
+║ 5. Name it "ai-home-assistant", copy the value
+║ 6. Paste below (input hidden):
+════════════════════════════════════════════════════════════
+EOF
+
+  if [[ -n "$DRY_RUN" ]]; then
+    echo "  (dry-run) skipping interactive prompt"
+    return 0
+  fi
+
+  local token attempt=0
+  while [[ $attempt -lt 3 ]]; do
+    read -rs -p "HA token: " token; echo
+    token=$(echo "$token" | tr -d '[:space:]')
+    if [[ -z "$token" ]]; then
+      echo "ERR: empty token. Try again." >&2
+      attempt=$((attempt+1)); continue
+    fi
+    if validate_token "$token"; then
+      echo "HA_TOKEN=$token" > "$INSTALL_DIR/docker/.env"
+      chmod 600 "$INSTALL_DIR/docker/.env"
+      echo "✓ Token validated and saved to $INSTALL_DIR/docker/.env (0600)"
+      return 0
+    fi
+    attempt=$((attempt+1))
+  done
+  echo "ERR: 3 token attempts failed. Aborting." >&2
+  exit 78
+}
+
 main() {
   if [[ "${1:-}" == "--help" ]]; then usage; exit 0; fi
   if [[ "${1:-}" == "--dry-run" ]]; then DRY_RUN=1; fi
@@ -122,11 +179,13 @@ main() {
   fetch_repo
   pull_images
   start_ha
+  prompt_token
   if [[ -n "$DRY_RUN" ]]; then
-    echo "✓ Dry run complete (prereq + repo + pull + ha-start plan)."
+    echo "✓ Dry run complete (all stages except actual exec)."
     exit 0
   fi
-  echo "TODO: prompt_token / start_aiha / banner (next tasks)"
+  echo "TODO: start_aiha / banner (final task)"
 }
 
-main "$@"
+# Only run main when executed directly, not when sourced (e.g. for unit tests).
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi
