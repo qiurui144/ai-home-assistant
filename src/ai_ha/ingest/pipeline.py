@@ -11,6 +11,10 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ai_ha.web.routes.stream import EventBroadcaster
 
 from ai_ha.ingest.counters import HourBucketRing
 from ai_ha.privacy.hide_matcher import HideMatcher
@@ -36,6 +40,8 @@ class IngestPipeline:
         self, *, dao: StoreDAO, entity_index: EntityIndex,
         hide_matcher: HideMatcher,
         batch_size: int = 100, batch_interval_ms: int = 1000,
+        broadcaster: EventBroadcaster | None = None,
+        room_state_throttle_ms: int = 1000,
     ) -> None:
         self._dao = dao
         self._idx = entity_index
@@ -48,6 +54,9 @@ class IngestPipeline:
         self._lock = asyncio.Lock()
         self._stop = asyncio.Event()
         self._flush_task: asyncio.Task[None] | None = None
+        self._broadcaster = broadcaster
+        self._room_state_throttle_ms = room_state_throttle_ms
+        self._last_room_state_publish: dict[str, int] = {}
 
     async def start(self) -> None:
         self._flush_task = asyncio.create_task(self._periodic_flush())
@@ -110,6 +119,23 @@ class IngestPipeline:
             await self._dao.increment_counter(aid, hour_bucket_utc=bucket, by=n)
         for eid, last_ts in per_entity_last.items():
             await self._dao.bump_entity_event_counts(entity_id=eid, last_seen_at=last_ts)
+        # Publish throttled room_state events for affected areas (v0.1.5)
+        if self._broadcaster is not None:
+            import time as _time
+            now_ms = int(_time.time() * 1000)
+            affected_areas = {area for (area, _bucket) in per_area}
+            for area_id in affected_areas:
+                last = self._last_room_state_publish.get(area_id, 0)
+                if now_ms - last >= self._room_state_throttle_ms:
+                    self._last_room_state_publish[area_id] = now_ms
+                    try:
+                        from ai_ha.web.routes.stream import publish_room_state
+                        await publish_room_state(
+                            self._broadcaster,
+                            area_id=area_id, last_seen_at=now_ms, active=True,
+                        )
+                    except Exception:
+                        logger.exception("publish_room_state failed")
         self._buffer.clear()
         self._first_added = None
 
