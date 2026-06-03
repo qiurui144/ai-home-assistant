@@ -48,3 +48,17 @@ def test_supported_locales_includes_en_and_zh():
 def test_get_translation_returns_translation():
     t = get_translation("en")
     assert isinstance(t, gettext.NullTranslations)  # NullTranslations or GNUTranslations
+
+
+def test_install_translations_to_jinja_env():
+    from jinja2 import Environment, select_autoescape
+
+    from ai_ha.web.i18n import install_translations
+    env = Environment(
+        extensions=["jinja2.ext.i18n"],
+        autoescape=select_autoescape(),
+    )
+    install_translations(env, "en")
+    # render a trans block; en is null-translated, so output == input
+    tpl = env.from_string("{% trans %}Rooms{% endtrans %}")
+    assert tpl.render() == "Rooms"

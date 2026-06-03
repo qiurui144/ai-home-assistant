@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from ai_ha.web.i18n import install_translations, locale_from_request
 from ai_ha.web.routes import AppState
 
 _TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
@@ -18,6 +19,12 @@ templates = Jinja2Templates(directory=str(_TEMPLATE_DIR))
 templates.env.filters["tstoiso"] = lambda ms: datetime.fromtimestamp(
     ms / 1000.0, tz=UTC,
 ).isoformat()
+templates.env.add_extension("jinja2.ext.i18n")
+
+
+def _render(request: Request, name: str, ctx: dict[str, object]) -> HTMLResponse:
+    install_translations(templates.env, locale_from_request(request))  # type: ignore[arg-type]
+    return templates.TemplateResponse(request, name, ctx)
 
 
 def build_pages_router(
@@ -29,7 +36,7 @@ def build_pages_router(
     @router.get("/", response_class=HTMLResponse)
     async def rooms(request: Request) -> HTMLResponse:
         if state is None:
-            return templates.TemplateResponse(request, "rooms.html", {"areas": []})
+            return _render(request, "rooms.html", {"areas": []})
         rows = await state.dao.list_areas()
         now_hour = int(time.time() * 1000) // 3_600_000
         counters = await state.dao.get_counters_24h(now_hour=now_hour)
@@ -53,7 +60,7 @@ def build_pages_router(
                 "is_active": last_seen_max > active_cutoff,
                 "entity_count": len(ents),
             })
-        return templates.TemplateResponse(request, "rooms.html", {"areas": areas_out})
+        return _render(request, "rooms.html", {"areas": areas_out})
 
     @router.get("/room/{area_id}", response_class=HTMLResponse, response_model=None)
     async def room(request: Request, area_id: str) -> Any:
@@ -65,25 +72,23 @@ def build_pages_router(
             return RedirectResponse("/")
         entities = await state.dao.list_entities(area_id=area_id)
         recent = await state.dao.list_events(area_id=area_id, limit=50)
-        return templates.TemplateResponse(request, "room.html", {
+        return _render(request, "room.html", {
             "area": match, "entities": entities, "recent_events": recent,
         })
 
     @router.get("/entities", response_class=HTMLResponse)
     async def entities_page(request: Request) -> HTMLResponse:
         ents = await state.dao.list_entities(limit=500) if state else []
-        return templates.TemplateResponse(request, "entities.html",
-                                          {"entities": ents})
+        return _render(request, "entities.html", {"entities": ents})
 
     @router.get("/timeline", response_class=HTMLResponse)
     async def timeline_page(request: Request) -> HTMLResponse:
         evs = await state.dao.list_events(limit=200) if state else []
-        return templates.TemplateResponse(request, "timeline.html",
-                                          {"events": evs})
+        return _render(request, "timeline.html", {"events": evs})
 
     @router.get("/settings", response_class=HTMLResponse)
     async def settings_page(request: Request) -> HTMLResponse:
-        ctx = {"hide_pattern": state.hide_pattern if state else []}
-        return templates.TemplateResponse(request, "settings.html", ctx)
+        ctx: dict[str, object] = {"hide_pattern": state.hide_pattern if state else []}
+        return _render(request, "settings.html", ctx)
 
     return router
