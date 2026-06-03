@@ -98,7 +98,9 @@ on first run). Important ones:
 
 ## Status
 
-**v0.1.0-rc.1** — Listen-only foundation, release candidate. See [RELEASE.md](RELEASE.md) for highlights and known limitations. GA (v0.1.0) requires real RK3588 hardware verification + 7d soak (see `tests/MANUAL_TEST_CHECKLIST.md`). v0.2 (histogram behavior model) starts after GA.
+**v0.1.5-rc.1** — Deployment + UI optimization release candidate. See
+[RELEASE.md](RELEASE.md). GA requires mobile device verification +
+real RK3588 install.sh run. v0.2 (histogram behavior model) is next.
 
 ## License
 

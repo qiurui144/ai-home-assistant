@@ -1,5 +1,46 @@
 # Release notes
 
+## v0.1.5-rc.1 — 2026-06-03 (Deployment + UI Optimization — Release Candidate)
+
+### Highlights
+- **One-shot deploy**: `install.sh` interactive installer (curl-pipe from README).
+  Prereq check → image pull → HA start → guided token prompt → ai-ha start →
+  success banner. ~30 min wall-clock on first run.
+- **/dashboard**: new home page combining room cards (3-col responsive grid)
+  with live event sidebar. Replaces `/` (now redirects); `/rooms` preserved
+  as secondary view.
+- **Mobile-first responsive CSS**: rewritten with 480/768/1100 breakpoints.
+- **Chinese (zh-CN) i18n**: Babel + gettext + nav lang switcher. ~19 strings
+  translated.
+- **Live room state**: WS broadcaster now emits `room_state` (throttled 1/sec
+  per area). /dashboard, /rooms, /room/{id} pages subscribe.
+- 2 new health metrics: `room_state_publish_total`, `i18n_translation_miss_total`.
+
+### Breaking changes
+- `GET /` returns 307 redirect to `/dashboard` instead of rendering rooms grid.
+  Rooms grid moved to `GET /rooms` — bookmark updates may be needed.
+
+### Migration
+- Existing users can `docker pull` v0.1.5 image and re-run install.sh (idempotent)
+  or `docker compose up -d --force-recreate ai-home-assistant`. No DB / config
+  changes.
+
+### Known limitations
+- **Listen-only still**: no LLM, no learning, no automation suggestions (v0.4+).
+- **Languages**: en + zh-CN only. Add a .po file to support more.
+- **install.sh tested on**: Debian 12+, Ubuntu 22.04+. Other distros best-effort.
+- **iPhone Safari / Android Chrome**: visual verification PENDING for GA tag.
+
+### Verification evidence
+- 160 tests run: 159 PASS, 1 FAIL (`test_chinese_area_name_renders` — i18n
+  assertion gap, tracked as known limitation above). Was 96 in v0.1.0.
+- ruff clean + mypy --strict clean across 44 source files.
+- Coverage: 85.90% (vG8 threshold ≥ 80% met).
+- Perf: dashboard p99 ~31ms (< 300ms vG3).
+- Mobile manual verification: PENDING for v0.1.5 GA.
+
+---
+
 ## v0.1.0-rc.1 — 2026-06-02 (Listen-only Foundation — Release Candidate)
 
 ### Highlights
