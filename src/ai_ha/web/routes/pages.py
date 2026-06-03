@@ -76,7 +76,7 @@ def build_pages_router(
                 "area_id": r.area_id, "name": r.name,
                 "events_per_hour_24h": per_area.get(r.area_id, 0),
                 "device_class_distribution": class_dist,
-                "is_active": last_seen_max > active_cutoff,
+                "active": last_seen_max > active_cutoff,
                 "entity_count": len(ents),
             })
         return _render(request, "rooms.html", {"areas": areas_out})

@@ -1,23 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Rooms · ai-home-assistant{% endblock %}
+{% from "_macros.html" import room_card %}
+{% block title %}{% trans %}Rooms{% endtrans %} · ai-home-assistant{% endblock %}
 {% block main %}
-<h1>Rooms</h1>
+<h1>{% trans %}Rooms{% endtrans %}</h1>
 {% if not areas %}
-  <p class="empty">No areas yet. Waiting for first topology snapshot from Home Assistant.</p>
+  <p class="empty">{% trans %}No areas yet. Waiting for first topology snapshot.{% endtrans %}</p>
 {% else %}
-<div class="grid">
+<div class="room-grid">
   {% for a in areas %}
-  <a class="card{% if a.is_active %} active{% endif %}" href="/room/{{ a.area_id }}">
-    <h2>{{ a.name }}</h2>
-    <div class="metric"><span>{{ a.entity_count }}</span> entities</div>
-    <div class="metric"><span>{{ a.events_per_hour_24h }}</span> events/24h</div>
-    <div class="classes">
-      {% for cls, n in a.device_class_distribution.items() %}
-      <span class="tag">{{ cls }}×{{ n }}</span>
-      {% endfor %}
-    </div>
-  </a>
+    {{ room_card(a) }}
   {% endfor %}
 </div>
 {% endif %}
 {% endblock %}
+{% block scripts %}<script src="/static/rooms.js"></script>{% endblock %}
