@@ -28,5 +28,5 @@ async def test_chinese_area_name_renders(tmp_path):
     ts.ensure_token()
     app = create_app(token_store=ts, state=state)
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://x") as c:
-        r = await c.get("/", auth=("admin", ts.read()))
+        r = await c.get("/rooms", auth=("admin", ts.read()))
         assert "厨房" in r.text
