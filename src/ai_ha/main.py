@@ -114,6 +114,7 @@ async def _run(config_path: str, data_dir: str) -> int:
     broadcaster = EventBroadcaster()
     pipeline = IngestPipeline(
         dao=dao, entity_index=entity_index, hide_matcher=hide_matcher,
+        broadcaster=broadcaster,
     )
     await pipeline.start()
     jsonl = JsonlWriter(str(data_path / "events"), compress=cfg.archive.compress)

@@ -38,3 +38,18 @@ def test_record_privacy_drop():
     m.record_privacy_drop()
     m.record_privacy_drop()
     assert m.snapshot(now_ms=1000)["hidden_event_count"] == 2
+
+
+def test_inc_room_state_publish_counter():
+    m = HealthMetrics(install_start_ms=0)
+    m.inc_room_state_publish()
+    m.inc_room_state_publish()
+    s = m.snapshot(now_ms=1000)
+    assert s["room_state_publish_total"] == 2
+
+
+def test_inc_i18n_translation_miss():
+    m = HealthMetrics(install_start_ms=0)
+    m.inc_i18n_translation_miss()
+    s = m.snapshot(now_ms=1000)
+    assert s["i18n_translation_miss_total"] == 1

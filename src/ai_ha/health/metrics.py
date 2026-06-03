@@ -17,6 +17,8 @@ class HealthMetrics:
         self._privacy_compile_fail = 0
         self._config_reload_fail = 0
         self._ha_version: str | None = None
+        self._room_state_publish = 0
+        self._i18n_translation_miss = 0
 
     def set_ws_connected(self, ok: bool) -> None:
         self._ws_connected = ok
@@ -38,6 +40,12 @@ class HealthMetrics:
 
     def inc_config_reload_fail(self) -> None:
         self._config_reload_fail += 1
+
+    def inc_room_state_publish(self) -> None:
+        self._room_state_publish += 1
+
+    def inc_i18n_translation_miss(self) -> None:
+        self._i18n_translation_miss += 1
 
     def record_event(self, *, ts_ms: int) -> None:
         self._event_log_recent.append(ts_ms)
@@ -65,4 +73,6 @@ class HealthMetrics:
             "wal_recovery_count": self._wal_recovery_count,
             "privacy_regex_compile_fail_total": self._privacy_compile_fail,
             "config_reload_fail_total": self._config_reload_fail,
+            "room_state_publish_total": self._room_state_publish,
+            "i18n_translation_miss_total": self._i18n_translation_miss,
         }
