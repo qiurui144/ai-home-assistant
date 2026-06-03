@@ -24,6 +24,11 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt \
 COPY src/ /app/src/
 COPY config/default.toml /app/config/default.toml
 
+# Compile translation .mo files (Babel only needed at build time)
+RUN pip install --no-cache-dir Babel==2.16.0 \
+    && pybabel compile -d /app/src/ai_ha/web/i18n/locales -D ai_ha \
+    && pip uninstall -y Babel
+
 # Default data dir (mount a volume here in prod)
 RUN mkdir -p /data
 VOLUME /data

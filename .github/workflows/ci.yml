@@ -37,7 +37,18 @@ jobs:
         run: |
           pip install -r requirements.txt
           PYTHONPATH=src pytest tests/unit tests/integration -v --cov=src/ai_ha --cov-report=term-missing
+      - name: Verify i18n key extraction is current
+        run: |
+          pip install Babel==2.16.0
+          pybabel extract -F src/ai_ha/web/i18n/babel.cfg \
+            -o /tmp/messages.pot .
+          if ! diff <(grep '^msgid' src/ai_ha/web/i18n/messages.pot | sort -u) \
+                    <(grep '^msgid' /tmp/messages.pot | sort -u); then
+            echo "ERR: messages.pot is out of date. Re-extract."
+            exit 1
+          fi
       - name: Lint + type check
+
         run: |
           ruff check src/ tests/
           mypy src/

@@ -29,3 +29,6 @@ coverage/
 htmlcov/
 dist/
 .superpowers/
+
+# i18n compiled translations (built in Docker)
+src/ai_ha/web/i18n/locales/**/*.mo
