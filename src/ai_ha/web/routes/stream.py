@@ -37,6 +37,29 @@ class EventBroadcaster:
             self._queues.discard(q)
 
 
+async def publish_state_changed(
+    broadcaster: EventBroadcaster, *,
+    ts_ms: int, entity_id: str, event_type: str, area_id: str | None = None,
+) -> None:
+    await broadcaster.publish({
+        "type": "state_changed", "ts": ts_ms,
+        "entity_id": entity_id, "event_type": event_type, "area_id": area_id,
+    })
+
+
+async def publish_room_state(
+    broadcaster: EventBroadcaster, *,
+    area_id: str, last_seen_at: int, active: bool, entity_count: int | None = None,
+) -> None:
+    payload: dict[str, object] = {
+        "type": "room_state",
+        "area_id": area_id, "last_seen_at": last_seen_at, "active": active,
+    }
+    if entity_count is not None:
+        payload["entity_count"] = entity_count
+    await broadcaster.publish(payload)
+
+
 def build_ws_router(broadcaster: EventBroadcaster) -> APIRouter:
     router = APIRouter()
 
